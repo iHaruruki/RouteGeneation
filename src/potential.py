@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # ここに地図のファイルパスを指定
 MAP_FILE = "..\maps\map3.pgm"
@@ -15,14 +16,13 @@ def load_map(file_path, threshold=220):
     return occupancy_grid
 
 # ポテンシャル法
-def potential_field(grid, start, goal, max_iterations=5000, attraction_coeff=5.0, repulsion_coeff=100.0, repulsion_radius=5):
+def potential_field(grid, start, goal, max_iterations=5000, attraction_coeff=5.0, repulsion_coeff=50.0, repulsion_radius=5):
     grid_size = grid.shape
     potential = np.zeros(grid_size)
 
     # ゴールの引力場を設定
-    for y in range(grid_size[0]):
-        for x in range(grid_size[1]):
-            potential[y, x] = attraction_coeff * np.hypot(goal[0]-y, goal[1]-x)
+    y_indices, x_indices = np.indices(grid_size)
+    potential += attraction_coeff * np.hypot(goal[0]-y_indices, goal[1]-x_indices)
 
     # 障害物の斥力場を追加
     obstacle_y, obstacle_x = np.where(grid == 1)
@@ -36,7 +36,7 @@ def potential_field(grid, start, goal, max_iterations=5000, attraction_coeff=5.0
 
     path = [start]
     current = start
-    for _ in range(maximum_iterations := max(grid_size)*10):
+    for _ in range(max_iterations):
         if current == goal:
             break
         min_potential = float('inf')
@@ -62,6 +62,7 @@ def plot_path(grid, path, start, goal):
     plt.scatter([start[1]], [start[0]], marker="o", color="green", s=100, label="Start")
     plt.scatter([goal[1]], [goal[0]], marker="x", color="red", s=100, label="Goal")
     plt.legend()
+    plt.title("Path Planning")
     plt.show()
 
 # 地図確認用表示
@@ -73,11 +74,16 @@ def plot_start_goal(grid, start, goal):
     plt.title("Start and Goal position check")
     plt.show()
 
-# ポテンシャル場の表示
-def plot_potential_field(potential):
-    plt.imshow(potential, cmap='jet')
-    plt.colorbar()
-    plt.title("Potential Field")
+# ポテンシャル場の3次元表示
+def plot_potential_field_3d(potential):
+    X, Y = np.meshgrid(np.arange(potential.shape[1]), np.arange(potential.shape[0]))
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.plot_surface(X, Y, potential, cmap='jet')
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Potential')
+    ax.set_title("3D Potential Field")
     plt.show()
 
 # メイン関数
@@ -92,7 +98,7 @@ if __name__ == "__main__":
 
     path, potential = potential_field(grid, start, goal)
 
-    plot_potential_field(potential)  # ポテンシャル場を表示
+    plot_potential_field_3d(potential)  # ポテンシャル場を3次元で表示
 
     if path and path[-1] == goal:
         print(f"経路が見つかりました！ステップ数: {len(path)}")
