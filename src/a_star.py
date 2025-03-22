@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     # スタートとゴールの座標を設定 (y, x)の形式で指定
     start = (20, 20)
-    goal = (350, 350)
+    goal = (400, 400)
 
     plot_start_goal(grid, start, goal)  # 位置確認用表示
 
