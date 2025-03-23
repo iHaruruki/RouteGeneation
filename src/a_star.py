@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import heapq
 
 # ここに地図のファイルパスを指定
-MAP_FILE = r"..\maps\maze_map.pgm"
+MAP_FILE = r"..\maps\map3.pgm"
 
 # 地図をロード
 def load_map(file_path, threshold=220):
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     # スタートとゴールの座標を設定 (y, x)の形式で指定
     start = (20, 20)
-    goal = (400, 400)
+    goal = (90, 90)
 
     plot_start_goal(grid, start, goal)  # 位置確認用表示
 
